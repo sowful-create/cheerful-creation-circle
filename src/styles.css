@@ -156,5 +156,50 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "palt" 1;
   }
 }
+
+@utility table-scroll {
+  max-height: calc(100vh - 17rem);
+  overflow: auto;
+}
+
+@utility sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+}
+
+@utility sticky-head-1 {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+@utility sticky-head-2 {
+  position: sticky;
+  top: 2.25rem;
+  z-index: 30;
+}
+
+@utility sticky-corner {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 40;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted-foreground) 40%, transparent);
+  border-radius: 6px;
+}
+
