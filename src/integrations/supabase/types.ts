@@ -14,7 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_users: {
+        Row: {
+          active: boolean
+          can_edit: boolean
+          created_at: string
+          id: string
+          name: string
+          pin_hash: string
+          role: string
+          sort_order: number
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          can_edit?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          pin_hash: string
+          role?: string
+          sort_order?: number
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          can_edit?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          pin_hash?: string
+          role?: string
+          sort_order?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shift_records: {
+        Row: {
+          end_time: string
+          id: string
+          member_id: string
+          review_comment: string
+          review_status: string
+          reviewed_by: string
+          slot: string
+          start_time: string
+          updated_at: string
+          visited_location: string
+          work_content: string
+          work_date: string
+        }
+        Insert: {
+          end_time?: string
+          id?: string
+          member_id: string
+          review_comment?: string
+          review_status?: string
+          reviewed_by?: string
+          slot: string
+          start_time?: string
+          updated_at?: string
+          visited_location?: string
+          work_content?: string
+          work_date: string
+        }
+        Update: {
+          end_time?: string
+          id?: string
+          member_id?: string
+          review_comment?: string
+          review_status?: string
+          reviewed_by?: string
+          slot?: string
+          start_time?: string
+          updated_at?: string
+          visited_location?: string
+          work_content?: string
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shift_records_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
