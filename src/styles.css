@@ -161,7 +161,30 @@
   }
 }
 
+@utility input-base {
+  display: block;
+  width: 100%;
+  border-radius: 0.625rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--color-foreground);
+  outline: none;
+}
+@utility input-base {
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-primary) 18%, transparent);
+  }
+  &:disabled {
+    background-color: var(--color-muted);
+    color: var(--color-muted-foreground);
+  }
+}
+
 @utility table-scroll {
+
   max-height: calc(100vh - 17rem);
   overflow: auto;
 }
