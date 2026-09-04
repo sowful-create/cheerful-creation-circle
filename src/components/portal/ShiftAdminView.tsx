@@ -56,8 +56,13 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
   const saveDraft = () =>
     commit(
       Object.entries(draft).map(([key, visitedLocation]) => {
-        const [memberId, date, slot] = key.split("|");
-        return { memberId, date, slot: slot as "午前" | "午後", visitedLocation };
+        const parts = key.split("|");
+        return {
+          memberId: parts[0] ?? "",
+          date: parts[1] ?? "",
+          slot: (parts[2] ?? "午前") as "午前" | "午後",
+          visitedLocation,
+        };
       }),
     );
 
@@ -92,7 +97,7 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
     try {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array" });
-      const sheetName = wb.SheetNames[0];
+      const sheetName = wb.SheetNames[0] ?? "";
       const sheet = sheetName ? wb.Sheets[sheetName] : undefined;
       if (!sheet) throw new Error("シートが見つかりません");
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
