@@ -300,7 +300,10 @@ function PortalPage() {
         <ReportModal
           target={target}
           user={user}
-          record={recordMap.get(recordKey(target.member.id, target.date, target.slot))}
+          {...(() => {
+            const rec = recordMap.get(recordKey(target.member.id, target.date, target.slot));
+            return rec ? { record: rec } : {};
+          })()}
           onClose={() => setTarget(null)}
           onSave={async (values) => {
             try {
