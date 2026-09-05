@@ -95,7 +95,7 @@ export function MatrixView({ user, members, year, month, records, onOpen }: Prop
                 <tr key={member.id} className="border-b border-border hover:bg-accent/30">
                   <td
                     className={`sticky-col border-r border-border p-3 font-semibold ${
-                      isSelf ? "bg-primary/10 text-primary" : "bg-card"
+                      isSelf ? "bg-secondary text-primary" : "bg-card"
                     }`}
                   >
                     {member.name}

@@ -77,7 +77,7 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
             ユーザーID: m.userId,
             氏名: m.name,
             日付: date,
-            曜日: DAY_NAMES[new Date(year, month - 1, day).getDay()],
+            曜日: DAY_NAMES[new Date(year, month - 1, day).getDay()] ?? "",
             時間帯: slot,
             訪問先: rec?.visitedLocation ?? "",
             勤務内容: rec?.workContent ?? "",
