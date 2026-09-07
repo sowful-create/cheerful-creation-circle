@@ -111,8 +111,13 @@ export const getSessionUser = createServerFn({ method: "POST" }).handler(async (
 export const getMonthData = createServerFn({ method: "POST" })
   .inputValidator((d: { year: number; month: number }) => monthInput.parse(d))
   .handler(async ({ data }) => {
-    const { requireUser, getAdmin } = await import("./portal.server");
-    await requireUser();
+    const { currentUser, getAdmin } = await import("./portal.server");
+    const user = await currentUser();
+    // A missing/expired session is an expected application state. Returning it
+    // as data avoids turning an automatic refresh into an unhandled RPC error.
+    if (!user) {
+      return { authenticated: false as const, members: [], records: [] };
+    }
     const supabaseAdmin = await getAdmin();
     const { from, to } = monthRange(data.year, data.month);
 
@@ -131,6 +136,7 @@ export const getMonthData = createServerFn({ method: "POST" })
     if (rErr) throw new Error(rErr.message);
 
     return {
+      authenticated: true as const,
       members: (members ?? []).map(mapMember),
       records: (records ?? []).map(mapRecord),
     };
