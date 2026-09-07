@@ -72,6 +72,13 @@ function PortalPage() {
       setLoading(true);
       try {
         const data = await getMonthData({ data: { year: y, month: m } });
+        if (!data.authenticated) {
+          setUser(null);
+          setMembers([]);
+          setRecords([]);
+          notify("セッションが切れました。もう一度ログインしてください", "error");
+          return;
+        }
         setMembers(data.members);
         setRecords(data.records);
       } catch (err) {
