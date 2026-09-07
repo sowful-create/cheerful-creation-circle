@@ -1,4 +1,4 @@
-import { useSession } from "@tanstack/react-start/server";
+import { useSession, getRequest } from "@tanstack/react-start/server";
 import { createHash } from "node:crypto";
 
 export type PortalSession = { memberId?: string };
@@ -11,20 +11,34 @@ export type SessionUser = {
   canEdit: boolean;
 };
 
+function isHttps() {
+  try {
+    const req = getRequest();
+    const proto = req.headers.get("x-forwarded-proto");
+    if (proto) return proto.split(",")[0]!.trim() === "https";
+    return new URL(req.url).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function sessionConfig() {
+  // プレビューは iframe 内（クロスサイト）で表示されるため、
+  // https のときは SameSite=None + Secure にしないとクッキーが送られない。
+  const https = isHttps();
   return {
     password: process.env["SESSION_SECRET"]!,
     name: "shift-portal",
     maxAge: 60 * 60 * 24 * 14,
     cookie: {
       httpOnly: true,
-      // localhost（http）では secure クッキーが保存されずセッションが消えるため本番のみ有効化
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "lax" as const,
+      secure: https,
+      sameSite: (https ? "none" : "lax") as "none" | "lax",
       path: "/",
     },
   };
 }
+
 
 export function getPortalSession() {
   return useSession<PortalSession>(sessionConfig());
