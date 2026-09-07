@@ -1,4 +1,4 @@
-import { useSession, getWebRequest } from "@tanstack/react-start/server";
+import { useSession, getRequest } from "@tanstack/react-start/server";
 import { createHash } from "node:crypto";
 
 export type PortalSession = { memberId?: string };
@@ -13,7 +13,7 @@ export type SessionUser = {
 
 function isHttps() {
   try {
-    const req = getWebRequest();
+    const req = getRequest();
     const proto = req.headers.get("x-forwarded-proto");
     if (proto) return proto.split(",")[0]!.trim() === "https";
     return new URL(req.url).protocol === "https:";
