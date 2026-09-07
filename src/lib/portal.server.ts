@@ -16,7 +16,13 @@ function sessionConfig() {
     password: process.env["SESSION_SECRET"]!,
     name: "shift-portal",
     maxAge: 60 * 60 * 24 * 14,
-    cookie: { httpOnly: true, secure: true, sameSite: "lax" as const, path: "/" },
+    cookie: {
+      httpOnly: true,
+      // localhost（http）では secure クッキーが保存されずセッションが消えるため本番のみ有効化
+      secure: process.env["NODE_ENV"] === "production",
+      sameSite: "lax" as const,
+      path: "/",
+    },
   };
 }
 

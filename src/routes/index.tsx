@@ -75,7 +75,15 @@ function PortalPage() {
         setMembers(data.members);
         setRecords(data.records);
       } catch (err) {
-        notify(err instanceof Error ? err.message : "データの取得に失敗しました", "error");
+        const msg = err instanceof Error ? err.message : "データの取得に失敗しました";
+        if (msg.includes("ログインが必要です")) {
+          setUser(null);
+          setMembers([]);
+          setRecords([]);
+          notify("セッションが切れました。もう一度ログインしてください", "error");
+        } else {
+          notify(msg, "error");
+        }
       } finally {
         setLoading(false);
       }
