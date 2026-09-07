@@ -226,6 +226,35 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
         </div>
       </div>
 
+      {importErrors.length > 0 && (
+        <div className="rounded-2xl border border-destructive/40 bg-destructive/10 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-bold text-destructive">
+              取込エラー（{importErrors.length} 件）
+            </h3>
+            <button
+              onClick={() => setImportErrors([])}
+              className="rounded-lg border border-destructive/40 px-2.5 py-1 text-xs font-semibold text-destructive"
+            >
+              閉じる
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            エラーを修正してから、もう一度インポートしてください。
+          </p>
+          <ul className="mt-2 max-h-52 space-y-1 overflow-y-auto text-xs">
+            {importErrors.map((e, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="shrink-0 font-semibold text-destructive">
+                  {e.row > 0 ? `${e.row}行目` : "ファイル"}
+                </span>
+                <span>{e.message}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="table-scroll">
           <table className="w-full border-collapse text-left text-xs">
