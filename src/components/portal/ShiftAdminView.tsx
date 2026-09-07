@@ -96,6 +96,7 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
   };
 
   const importExcel = async (file: File) => {
+    setImportErrors([]);
     try {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array" });
@@ -103,33 +104,84 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
       const sheet = sheetName ? wb.Sheets[sheetName] : undefined;
       if (!sheet) throw new Error("シートが見つかりません");
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
+      if (rows.length === 0) throw new Error("データ行がありません");
+
+      const headers = Object.keys(rows[0] ?? {});
+      const required = ["ユーザーID", "日付", "時間帯", "訪問先"];
+      const missing = required.filter((h) => !headers.includes(h));
+      if (missing.length > 0) {
+        throw new Error(`必須列が不足しています：${missing.join("・")}`);
+      }
+
       const byUserId = new Map(members.map((m) => [m.userId, m]));
       const entries: Entry[] = [];
+      const errors: { row: number; message: string }[] = [];
+      const seen = new Set<string>();
 
-      for (const r of rows) {
+      rows.forEach((r, i) => {
+        const rowNo = i + 2; // 1行目はヘッダー
+        const rowErrors: string[] = [];
+
         const userId = String(r["ユーザーID"] ?? "").trim();
-        const member = byUserId.get(userId);
-        const rawDate = r["日付"];
-        const slot = String(r["時間帯"] ?? "").trim();
-        const location = String(r["訪問先"] ?? "").trim();
-        if (!member || !slot || (slot !== "午前" && slot !== "午後")) continue;
+        const member = userId ? byUserId.get(userId) : undefined;
+        if (!userId) rowErrors.push("ユーザーIDが未入力です");
+        else if (!member) rowErrors.push(`ユーザーID「${userId}」は登録されていません`);
 
+        const slot = String(r["時間帯"] ?? "").trim();
+        if (!slot) rowErrors.push("時間帯が未入力です");
+        else if (slot !== "午前" && slot !== "午後")
+          rowErrors.push(`時間帯「${slot}」は「午前」または「午後」で入力してください`);
+
+        const rawDate = r["日付"];
         let date = "";
         if (rawDate instanceof Date) {
           date = `${rawDate.getFullYear()}-${String(rawDate.getMonth() + 1).padStart(2, "0")}-${String(rawDate.getDate()).padStart(2, "0")}`;
         } else {
-          date = String(rawDate).trim().slice(0, 10);
+          date = String(rawDate ?? "").trim().slice(0, 10);
         }
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+        if (!date) rowErrors.push("日付が未入力です");
+        else if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date).getTime()))
+          rowErrors.push(`日付「${String(rawDate)}」の形式が不正です（YYYY-MM-DD）`);
+        else if (!date.startsWith(`${year}-${String(month).padStart(2, "0")}`))
+          rowErrors.push(`日付「${date}」は表示中の ${year}年${month}月 以外です`);
 
-        const current = records.get(recordKey(member.id, date, slot))?.visitedLocation ?? "";
-        if (current === location) continue;
-        entries.push({ memberId: member.id, date, slot, visitedLocation: location });
+        const location = String(r["訪問先"] ?? "").trim();
+        if (location.length > 200) rowErrors.push("訪問先は200文字以内で入力してください");
+
+        if (member && (slot === "午前" || slot === "午後") && rowErrors.length === 0) {
+          const key = recordKey(member.id, date, slot);
+          if (seen.has(key)) rowErrors.push("同じメンバー・日付・時間帯の行が重複しています");
+          else seen.add(key);
+        }
+
+        if (rowErrors.length > 0) {
+          for (const message of rowErrors) errors.push({ row: rowNo, message });
+          return;
+        }
+
+        const key = recordKey(member!.id, date, slot as "午前" | "午後");
+        const current = records.get(key)?.visitedLocation ?? "";
+        if (current === location) return;
+        entries.push({
+          memberId: member!.id,
+          date,
+          slot: slot as "午前" | "午後",
+          visitedLocation: location,
+        });
+      });
+
+      if (errors.length > 0) {
+        setImportErrors(errors);
+        notify(`${errors.length} 件のエラーがあるため取り込みを中止しました`, "error");
+        return;
       }
+
       await commit(entries);
       notify(`${entries.length} 件を取り込みました`);
     } catch (err) {
-      notify(err instanceof Error ? err.message : "インポートに失敗しました", "error");
+      const message = err instanceof Error ? err.message : "インポートに失敗しました";
+      setImportErrors([{ row: 0, message }]);
+      notify(message, "error");
     } finally {
       if (fileRef.current) fileRef.current.value = "";
     }
