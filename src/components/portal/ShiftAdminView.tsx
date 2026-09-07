@@ -20,6 +20,8 @@ export function ShiftAdminView({ members, year, month, records, onSave, notify }
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [importErrors, setImportErrors] = useState<{ row: number; message: string }[]>([]);
+
   const days = useMemo(() => Array.from({ length: total }, (_, i) => i + 1), [total]);
   const dirtyCount = Object.keys(draft).length;
 
