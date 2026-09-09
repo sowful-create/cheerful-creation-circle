@@ -4,7 +4,8 @@ import type { SessionUser } from "@/components/portal/types";
 import {
   DAY_NAMES,
   SLOTS,
-  STATE_DOT,
+  STATE_CELL,
+  STATE_SWATCH,
   type SlotState,
   dateStr,
   daysInMonth,
@@ -39,7 +40,7 @@ export function MatrixView({ user, members, year, month, records, onOpen }: Prop
     { state: "要修正", label: "要修正" },
     { state: "提出済", label: "提出済" },
     { state: "確認済", label: "確認済" },
-    { state: "予定あり", label: "予定あり" },
+    { state: "休み", label: "休み" },
   ];
 
   return (
@@ -50,7 +51,7 @@ export function MatrixView({ user, members, year, month, records, onOpen }: Prop
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1" aria-label="状態の色分け">
             {legend.map(({ state, label }) => (
               <span key={state} className="inline-flex items-center gap-1 whitespace-nowrap">
-                <span className={`h-2 w-2 rounded-full ${STATE_DOT[state]}`} aria-hidden="true" />
+                <span className={`h-2.5 w-2.5 rounded-sm border ${STATE_SWATCH[state]}`} aria-hidden="true" />
                 {label}
               </span>
             ))}
@@ -129,16 +130,13 @@ export function MatrixView({ user, members, year, month, records, onOpen }: Prop
                         <td
                           key={`${day}-${slot}`}
                           onClick={() => clickable && onOpen(member, date, slot)}
-                          className={`border-r border-border p-1.5 align-top ${
-                            clickable ? "cursor-pointer hover:bg-accent/60" : ""
+                          className={`border-r border-border p-1.5 align-top ${STATE_CELL[state]} ${
+                            clickable ? "cursor-pointer hover:brightness-95" : ""
                           }`}
                         >
-                          <div className="flex items-center gap-1">
-                            <span className={`h-2 w-2 shrink-0 rounded-full ${STATE_DOT[state]}`} />
-                            <span className="truncate text-[10px] text-muted-foreground">
-                              {rec?.visitedLocation || "-"}
-                            </span>
-                          </div>
+                          <span className="block truncate text-[10px] text-foreground/80">
+                            {rec?.visitedLocation || "-"}
+                          </span>
                         </td>
                       );
                     });
