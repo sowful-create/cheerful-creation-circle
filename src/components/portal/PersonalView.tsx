@@ -4,6 +4,7 @@ import {
   DAY_NAMES,
   SLOTS,
   STATE_BADGE,
+  STATE_SURFACE,
   dateStr,
   daysInMonth,
   recordKey,
@@ -60,7 +61,7 @@ export function PersonalView({ user, member, year, month, records, onOpen }: Pro
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-3">
         {Array.from({ length: total }, (_, i) => i + 1).map((day) => {
           const date = dateStr(year, month, day);
           const dow = new Date(year, month - 1, day).getDay();
@@ -87,7 +88,7 @@ export function PersonalView({ user, member, year, month, records, onOpen }: Pro
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {SLOTS.map((slot) => {
                   const rec = records.get(recordKey(member.id, date, slot));
                   const state = slotState(rec);
@@ -96,7 +97,7 @@ export function PersonalView({ user, member, year, month, records, onOpen }: Pro
                       key={slot}
                       type="button"
                       onClick={() => onOpen(member, date, slot)}
-                      className="w-full rounded-xl border border-border bg-background p-2.5 text-left transition hover:border-primary/50 hover:bg-accent/40"
+                        className={`w-full rounded-xl border p-3 text-left transition ${STATE_SURFACE[state]}`}
                     >
                       <div className="mb-1.5 flex items-center justify-between">
                         <span className="text-xs font-bold">{slot}</span>
