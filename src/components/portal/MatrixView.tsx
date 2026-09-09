@@ -5,6 +5,7 @@ import {
   DAY_NAMES,
   SLOTS,
   STATE_DOT,
+  type SlotState,
   dateStr,
   daysInMonth,
   recordKey,
@@ -34,12 +35,28 @@ export function MatrixView({ user, members, year, month, records, onOpen }: Prop
   }, [year, month, members.length]);
 
   const isManager = user.role === "管理者" || user.role === "確認者";
+  const legend: Array<{ state: SlotState; label: string }> = [
+    { state: "要修正", label: "要修正" },
+    { state: "提出済", label: "提出済" },
+    { state: "確認済", label: "確認済" },
+    { state: "予定あり", label: "予定あり" },
+  ];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b border-border bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
         <span>自分の行をクリックすると日報入力画面が開きます</span>
-        <span>横スクロール可能（本日が中央に表示されます）</span>
+        <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1" aria-label="状態の色分け">
+            {legend.map(({ state, label }) => (
+              <span key={state} className="inline-flex items-center gap-1 whitespace-nowrap">
+                <span className={`h-2 w-2 rounded-full ${STATE_DOT[state]}`} aria-hidden="true" />
+                {label}
+              </span>
+            ))}
+          </div>
+          <span className="whitespace-nowrap">横スクロール可能（本日が中央に表示されます）</span>
+        </div>
       </div>
       <div ref={containerRef} className="table-scroll">
         <table className="w-full border-collapse text-left text-xs">

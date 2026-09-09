@@ -52,3 +52,11 @@ export const STATE_BADGE: Record<SlotState, string> = {
   予定あり: "bg-warning/18 text-warning-foreground border-warning/40",
   未入力: "bg-muted text-muted-foreground border-border",
 };
+
+export const STATE_SURFACE: Record<SlotState, string> = {
+  確認済: "border-success/40 bg-success/12 hover:border-success/60 hover:bg-success/18",
+  要修正: "border-destructive/40 bg-destructive/12 hover:border-destructive/60 hover:bg-destructive/18",
+  提出済: "border-info/40 bg-info/12 hover:border-info/60 hover:bg-info/18",
+  予定あり: "border-warning/50 bg-warning/18 hover:border-warning/70 hover:bg-warning/25",
+  未入力: "border-border bg-background hover:border-primary/50 hover:bg-accent/40",
+};
