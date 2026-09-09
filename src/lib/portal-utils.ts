@@ -24,7 +24,7 @@ export function indexRecords(records: RecordRow[]) {
   return map;
 }
 
-export type SlotState = "確認済" | "要修正" | "提出済" | "予定あり" | "未入力";
+export type SlotState = "確認済" | "要修正" | "提出済" | "休み" | "未入力";
 
 export function slotState(record?: RecordRow): SlotState {
   if (!record) return "未入力";
@@ -34,14 +34,14 @@ export function slotState(record?: RecordRow): SlotState {
     if (record.reviewStatus === "要修正") return "要修正";
     return "提出済";
   }
-  return record.visitedLocation.trim() ? "予定あり" : "未入力";
+  return record.visitedLocation.trim() ? "休み" : "未入力";
 }
 
 export const STATE_DOT: Record<SlotState, string> = {
   確認済: "bg-success",
   要修正: "bg-destructive",
   提出済: "bg-info",
-  予定あり: "bg-warning",
+  休み: "bg-warning",
   未入力: "bg-muted-foreground/30",
 };
 
@@ -49,7 +49,7 @@ export const STATE_BADGE: Record<SlotState, string> = {
   確認済: "bg-success/12 text-success border-success/30",
   要修正: "bg-destructive/12 text-destructive border-destructive/30",
   提出済: "bg-info/12 text-info border-info/30",
-  予定あり: "bg-warning/18 text-warning-foreground border-warning/40",
+  休み: "bg-warning/18 text-warning-foreground border-warning/40",
   未入力: "bg-muted text-muted-foreground border-border",
 };
 
@@ -57,6 +57,23 @@ export const STATE_SURFACE: Record<SlotState, string> = {
   確認済: "border-success/40 bg-success/12 hover:border-success/60 hover:bg-success/18",
   要修正: "border-destructive/40 bg-destructive/12 hover:border-destructive/60 hover:bg-destructive/18",
   提出済: "border-info/40 bg-info/12 hover:border-info/60 hover:bg-info/18",
-  予定あり: "border-warning/50 bg-warning/18 hover:border-warning/70 hover:bg-warning/25",
+  休み: "border-warning/50 bg-warning/18 hover:border-warning/70 hover:bg-warning/25",
   未入力: "border-border bg-background hover:border-primary/50 hover:bg-accent/40",
+};
+
+// マトリクスのセル全体を透過色で塗るためのクラス
+export const STATE_CELL: Record<SlotState, string> = {
+  確認済: "bg-success/15",
+  要修正: "bg-destructive/15",
+  提出済: "bg-info/15",
+  休み: "bg-warning/20",
+  未入力: "",
+};
+
+export const STATE_SWATCH: Record<SlotState, string> = {
+  確認済: "bg-success/25 border-success/50",
+  要修正: "bg-destructive/25 border-destructive/50",
+  提出済: "bg-info/25 border-info/50",
+  休み: "bg-warning/30 border-warning/60",
+  未入力: "bg-muted border-border",
 };
